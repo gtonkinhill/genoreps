@@ -6,7 +6,7 @@ from .core import find_gtdb_assemblies, load_metadata, dereplication, generate_s
 def get_arguments(args=None):
     parser = argparse.ArgumentParser(description='Rapid GTDB Assembly Dereplicator')
 
-    required_args = parser.add_argument_group('Positional arguments')
+    required_args = parser.add_argument_group('Input/output')
 
     required_args.add_argument('-i', '--in_dir', type=str, required=True,
                                help='Directory containing all assemblies. '
@@ -14,22 +14,26 @@ def get_arguments(args=None):
     
     required_args.add_argument('-o', '--out_dir', type=str, required=True,
                                help='Directory where dereplicated assemblies will be copied')
-
-    clustering_args = parser.add_argument_group('Dereplication target')
     
-    clustering_args.add_argument('--meta', type=str,
-                                 required=True,
+    required_args.add_argument('--meta', type=str, required=True,
                                  help='GTDB metadata file')
 
+    clustering_args = parser.add_argument_group('Clustering parameters')
+    
     clustering_args.add_argument('--distance',
                                  default=99,
                                  type=lambda x: float(x) if 0 <= float(x) <= 100 else argparse.ArgumentTypeError('--distance must be between 0 and 100'),
                                  help='Dereplicate until the closest pair has a pairwise identity of at lease this value (default=99)')
+    
+    clustering_args.add_argument('--method', choices=['mash', 'skani'], default='mash',
+                                 help='Method for pairwise distance estimation (default: mash). '
+                                      'Mash is faster but less accurate than skani.')
 
     clustering_args.add_argument('--gtdb_reps', action='store_true',
                               help='Simply outputs the current GTDB species representative genomes as specified in the meta data file.')
 
     setting_args = parser.add_argument_group('Settings')
+
 
     setting_args.add_argument('-t', '--threads', type=int, default=1,
                               help='Number of CPU threads for Mash (default: 1)')

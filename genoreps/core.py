@@ -5,7 +5,7 @@ import pathlib
 import pandas as pd
 
 from .mash import run_mash
-from .scani import run_scani
+from .skani import run_skani
 
 def load_metadata(metafile, assemblies):
     logging.info("Loading metadata file...")
@@ -51,9 +51,12 @@ def dereplication(assemblies, metadata, args):
         reduced_file_set = []
         for species in metadata:
             logging.info(f"Processing species: {species}")
-            # reduced_file_set += run_scani(list(metadata[species]['filename']), args)
+            # reduced_file_set += run_skani(list(metadata[species]['filename']), args)
             if len(list(metadata[species]['filename'])) > 1:
-                reduced_file_set += run_mash(list(metadata[species]['filename']), args)
+                if args.method == 'skani':
+                    reduced_file_set += run_skani(list(metadata[species]['filename']), args)
+                else:
+                    reduced_file_set += run_mash(list(metadata[species]['filename']), args)
             else:
                 reduced_file_set += list(metadata[species]['filename'])
             
